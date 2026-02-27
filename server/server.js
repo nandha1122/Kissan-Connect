@@ -155,6 +155,29 @@ app.get('/api/messages/unread/:username', async (req, res) => {
         res.json({ success: true, count });
     } catch (err) { res.status(500).json({ success: false }); }
 });
+// Add this to your Express server code
+app.put('/api/users/update/:id', async (req, res) => {
+  try {
+    const { name, bio } = req.body;
+    const userId = req.params.id;
+
+    // Find the user by ID and update their name and bio
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, bio },
+      { new: true } // This returns the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
 // Send message
 app.post('/api/messages/send', upload.single('image'), async (req, res) => {
